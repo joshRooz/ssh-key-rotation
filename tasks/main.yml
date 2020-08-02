@@ -1,37 +1,37 @@
 ---
-- import_tasks: generate_key.yml
-  when: generate_new_key | default(True)
+- name: Generate a new ssh keypair on ansible controller host
+  openssh_keypair:
+    path: "{{ lookup('env','PWD')}}/{{ ssh_key_path }}"
+    size: '{{ ssh_key_bits }}'
+    owner: "{{ lookup('env', 'USER') }}"
+    comment: '{{ ssh_key_comment }}'
+  when: inventory_hostname == play_hosts[0] # only run once across the active inventory
+  delegate_to: localhost
 
-- name: Ensure that ssh connection key is defined
+- name: Register our public keys
+  set_fact:
+    ssh_connection_key: "{{ lookup('file', lookup('env','PWD') + '/' + ssh_key_path + '.pub') }}"
+    ssh_dummy_key: "{{ lookup('file', lookup('env','PWD') + '/' + dummy_key_path + '.pub') }}"
+
+- name: Ensure that our public keys have been registered
   assert:
-    that: ssh_connection_key is defined
+    that:
+      - ssh_connection_key is defined
+      - ssh_dummy_key is defined
+    quiet: yes
 
-- name: Set Authorized key(s) to the authorized keys file
-  become: yes
-  become_user: root
-  when: ssh_connection_key is defined
+- name: Add/update amk public key in remote authorized_keys file
   authorized_key:
-    exclusive: '{{ is_exclusive }}'
+    exclusive: '{{ exclusive | default(false, true) }}'
     user: '{{ ssh_host_user }}'
     state: present
-    path: '{{ authorized_keys_path }}'
-    manage_dir: '{{ should_manage_dir }}'
-    key: "{{ ssh_connection_key }}"
+    manage_dir: '{{ should_manage_dir | default(false, true) }}'
+    key: '{{ ssh_connection_key }}'
 
-- name: copy
-  when: generate_new_key != true
-  copy:
-    content: "{{ ssh_connection_key }}"
-    dest: "{{ ssh_key_path }}"
-
-- name: Add deployment key
-  when: ssh_deployment_key is defined
-  become: yes
-  become_user: root
+- name: Remove default dummy key
   authorized_key:
+    state: absent
     user: '{{ ssh_host_user }}'
-    state: present
-    path: '{{ authorized_keys_path }}'
-    manage_dir: '{{ should_manage_dir }}'
-    key: "{{ ssh_deployment_key }}"
-
+    manage_dir: false
+    key: '{{ ssh_dummy_key }}'
+  when: not exclusive

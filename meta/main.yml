@@ -1,15 +1,29 @@
+---
 galaxy_info:
-  author: Thomas Nyambati
-  description: Ansible role that enables you to rotate ssh keys on your remote servers
-  company: Andela Kenya Ltd
+  author: Josh Roose
+  description: SSH key rotation.
+  company:
   license: MIT
-  min_ansible_version: 2.2
+  min_ansible_version: 2.9
   platforms:
+    - name: GenericUNIX
+      versions:
+        - all
     - name: Ubuntu
       versions:
-      - trusty
-  galaxy_tags: []
-  categories:
-  - system
-dependencies: []
+        - all
+    - name: EL
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: Arch Linux
+      versions:
+        - all
 
+  galaxy_tags:
+    - system
+    - openssh
+    - ssh-add
+    - security

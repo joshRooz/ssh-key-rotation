@@ -1,12 +1,20 @@
 ---
 # defaults file for ssh-key-rotation
-is_exclusive: no
-should_manage_dir: no
-authorized_keys_path: '{{ ansible_env.HOME }}/.ssh/authorized_keys'
-passphrase: 83g!8bfu5M5yy84x
-ssh_key_bits: 2048
-ssh_key_comment: domain@example.com
-ssh_host_user: vagrant
-ssh_key_path: ".ssh/new-ssh-key"
-generate_new_key: True
+date: "{{ lookup('pipe','date +%Y%m%d') }}"
 
+# Default remote user used by ansible controller
+ssh_host_user: ansible
+
+# Path and file name for the master key, used for ongoing ansible controller's remote connection
+ssh_key_path: .keychain/ssh-master-key
+# Path and file name for the default dummy key, used for initial provisioning
+dummy_key_path: .keychain/dummy-default-key
+
+# Warning: This will remove ALL other public keys
+exclusive: false
+
+# Setting to "true" ansible will create .ssh directory and authorized_keys file, plus set permissions
+should_manage_dir: false
+
+ssh_key_bits: 2048
+ssh_key_comment: 'amk-{{ date }}-@ansible-controller' # Ansible Master Key (AMK)
