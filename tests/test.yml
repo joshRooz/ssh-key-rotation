@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - ssh-key-rotation
+    - joshrooz.ssh-key-rotation

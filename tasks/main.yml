@@ -1,7 +1,8 @@
 ---
+# tasks file for joshrooz.ssh-key-rotation
 - name: Generate a new ssh keypair on ansible controller host
   openssh_keypair:
-    path: "{{ lookup('env','PWD')}}/{{ ssh_key_path }}"
+    path: "{{ lookup('env','PWD') }}/{{ ssh_key_path }}"
     size: '{{ ssh_key_bits }}'
     owner: "{{ lookup('env', 'USER') }}"
     comment: '{{ ssh_key_comment }}'

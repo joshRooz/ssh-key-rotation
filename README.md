@@ -1,103 +1,76 @@
-# SSH Key Rotation
+Ansible Role: SSH Key Rotation
+=========
 
-# [![Build Status](https://travis-ci.org/nyambati/ssh-key-rotation.svg?branch=master)](https://travis-ci.org/nyambati/ssh-key-rotation)
+A role that can rotate SSH keys as frequently as daily. If a default provisioning key is supplied it will be removed after generating a new key.
 
-This is ansible role that enables you to rotate ssh keys on your remote servers. You can find this role on [ansible galaxy](https://galaxy.ansible.com/nyambati/ssh-key-rotation)
+Requirements
+------------
 
-## Requirements
+Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
-This modules depends on ansible 2.2.X
+Role Variables
+--------------
 
-## Role Variables
+A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 
-For this role to work it requires the following variables:
+
+Default remote user used by ansible controller
+```yaml
+ssh_host_user: ansible
+```
+
+Path and file name for the master key, used for ongoing ansible controller's remote connection
+```yaml
+ssh_key_path: .keychain/ssh-master-key
+```
+
+Path and file name for the default dummy key, used for initial provisioning
+```yaml
+dummy_key_path: .keychain/dummy-default-key
+```
+
+Setting to "true" will remove all other public keys from the remote user's authorized_keys file
+```yaml
+exclusive: false
+```
+
+Setting to "true" will create .ssh directory and authorized_keys file, plus set permissions
+```yaml
+should_manage_dir: false
+```
+
+The length of the new key in bits
+```yaml
+ssh_key_bits: 2048
+```
+
+Comment to be added to the new public key
+```yaml
+date: "{{ lookup('pipe','date +%Y%m%d') }}"
+ssh_key_comment: 'amk-{{ date }}-@ansible-controller' # Ansible Master Key (AMK)
+```
+
+Dependencies
+------------
+
+None
+
+Example Playbook
+----------------
 
 ```yaml
-# Removes the existing public keys when set to yes
-is_exclusive: no
-
-should_manage_dir: no
-
-# The location to where the authorized_keys file existing
-# .shh/authorized_keys is the deafult value
-authorized_keys_path: .ssh/authorized_keys
-
-# This is the passphrase used to encrypt your new ssh key
-passphrase: 83g!8bfu5M5yy84x
-
-# The number of bits you want to assign the key
-ssh_key_bits: 2048
-
-# The comment that accompanies the key
-ssh_key_comment: domain@example.com
-
-# The user of the host keys are added to
-ssh_host_user: ubuntu
-
-# The location to store the keys to. (warning it should not begin with /)
-ssh_key_path: ".ssh/new-ssh-key"
-
-# if you already have generated you keys add the following variables.
-
-# Set to true by default
-generate_new_key: True
-ssh_connection_key: "some key"
-
-# add this if you want to add deployment key for your server,
-ssh_deployment_key: "deployment key"
-```
-
-The above variables and values are the default inputs to this role. You can check the default folder. Make sure you upate them with your own.
-
-Installation
-
-You can install this role from ansible galaxy by running
-
-```bash
-$ ansible-galaxy install nyambati.ssh-key-rotation
-```
-
-## Example Playbook
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-```
 ---
 - hosts: all
-  remote_user: vagrant
-  vars:
-    host_user: vagrant
-    ssh_key_path: .ssh/some-new-secure
   roles:
-    - nyambati.ssh-key-rotation
-
-
+    - { role: joshrooz.ssh-key-rotation }
 ```
 
-## License
+License
+-------
 
-MIT License
+MIT
 
-Copyright (c) 2017 Nyambati Thomas <thomasnyambati@gmal.com>
+Author Information
+------------------
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-## Author Information
-
-Thomas Nyambati <thomasnyambati@gmail.com>
+This role was created by Josh Roose in July 2020, and was originally forked from [nyambati/ssh-key-rotation](https://github.com/nyambati/ssh-key-rotation).

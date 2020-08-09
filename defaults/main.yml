@@ -1,5 +1,5 @@
 ---
-# defaults file for ssh-key-rotation
+# defaults file for joshrooz.ssh-key-rotation
 date: "{{ lookup('pipe','date +%Y%m%d') }}"
 
 # Default remote user used by ansible controller
@@ -11,7 +11,7 @@ ssh_key_path: .keychain/ssh-master-key
 dummy_key_path: .keychain/dummy-default-key
 
 # Warning: This will remove ALL other public keys
-exclusive: false
+exclusive: true
 
 # Setting to "true" ansible will create .ssh directory and authorized_keys file, plus set permissions
 should_manage_dir: false
