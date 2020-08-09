@@ -2,6 +2,6 @@
 - name: Converge
   hosts: all
   tasks:
-    - name: "Include joshrooz.ssh-key-rotation"
+    - name: "Include ssh-key-rotation"
       include_role:
-        name: "joshrooz.ssh-key-rotation"
+        name: "ssh-key-rotation"

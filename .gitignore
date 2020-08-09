@@ -131,3 +131,6 @@ dmypy.json
 # Vagrant stuff
 Vagrantfile
 vagrant*
+
+# Keychain related
+.keychain
