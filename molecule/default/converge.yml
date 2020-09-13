@@ -1,7 +1,31 @@
 ---
 - name: Converge
   hosts: all
+  vars_files:
+    - ../../defaults/main.yml
+
+  pre_tasks:
+    - name: update system
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: 'create {{ ssh_host_user }} user'
+      user:
+        name: '{{ ssh_host_user }}'
+        state: present
+        create_home: yes
+      register: user_info
+
   tasks:
     - name: "Include ssh-key-rotation"
       include_role:
         name: "ssh-key-rotation"
+
+  post_tasks:
+    - name: cleanup keychain directory
+      file:
+        path: '{{ keychain_path }}'
+        state: absent
+      when: inventory_hostname == play_hosts[0]
+      delegate_to: localhost

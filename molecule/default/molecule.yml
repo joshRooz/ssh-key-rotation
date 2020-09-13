@@ -9,9 +9,11 @@ lint: |
   ansible-lint
 platforms:
   - name: instance
-    image: docker.io/pycontribs/ubuntu
+    image: "docker.io/pycontribs/${MOLECULE-DISTRO:-ubuntu}"
     pre_build_image: true
 provisioner:
   name: ansible
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
 verifier:
   name: ansible
