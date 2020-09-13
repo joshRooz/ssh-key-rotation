@@ -8,17 +8,6 @@
   when: inventory_hostname == play_hosts[0]
   delegate_to: localhost
 
-- name: Include default dummy key
-  copy:
-    dest: '{{ keychain_path }}'
-    src: '{{ provisioning_key_fn }}'
-    mode: 0700
-    owner: "{{ lookup('env', 'USER') }}"
-  when:
-    - use_provisioning_key
-    - inventory_hostname == play_hosts[0]
-  delegate_to: localhost
-
 - name: Generate a new ssh keypair on ansible controller host
   openssh_keypair:
     path: '{{ keychain_path }}/{{ master_key_fn }}'
@@ -32,16 +21,10 @@
   set_fact:
     ssh_connection_key: "{{ lookup('file', keychain_path + '/' + master_key_fn + '.pub') }}"
 
-- name: Register the provisioning key
-  set_fact:
-    provisioning_key: "{{ provisioning_key_fn }}.pub }}"
-  when: use_provisioning_key
-
 - name: Ensure that our public keys have been registered
   assert:
     that:
       - ssh_connection_key is defined
-      #- provisioning_key is defined
     quiet: yes
 
 - name: Add/update amk public key in remote authorized_keys file
@@ -51,11 +34,3 @@
     state: present
     manage_dir: '{{ should_manage_dir | default(false, true) }}'
     key: '{{ ssh_connection_key }}'
-
-- name: Remove default dummy key
-  authorized_key:
-    state: absent
-    user: '{{ ssh_host_user }}'
-    manage_dir: false
-    key: '{{ ssh_dummy_key }}'
-  when: not exclusive

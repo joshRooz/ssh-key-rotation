@@ -18,9 +18,3 @@ should_manage_dir: false
 
 # Output only the date as the public key comment
 ssh_key_comment: "{{ lookup('pipe','date +%Y%m%d') }}"
-
-
-# Use included dummy key for provisioning
-use_provisioning_key: true
-# File name for the default dummy key, used for initial provisioning
-provisioning_key_fn: dummy-default-key
