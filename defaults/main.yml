@@ -1,14 +1,14 @@
 ---
 # defaults file for joshrooz.ssh-key-rotation
-date: "{{ lookup('pipe','date +%Y%m%d') }}"
 
 # Default remote user used by ansible controller
 ssh_host_user: ansible
 
-# Path and file name for the master key, used for ongoing ansible controller's remote connection
-ssh_key_path: .keychain/ssh-master-key
-# Path and file name for the default dummy key, used for initial provisioning
-dummy_key_path: .keychain/dummy-default-key
+# Key pair path
+keychain_path: "{{ lookup('env','PWD') }}/.keychain"
+
+# File name for the master key, used for ongoing ansible controller's remote connection
+master_key_fn: ssh-master-key
 
 # Warning: This will remove ALL other public keys
 exclusive: true
@@ -17,4 +17,11 @@ exclusive: true
 should_manage_dir: false
 
 ssh_key_bits: 2048
+date: "{{ lookup('pipe','date +%Y%m%d') }}"
 ssh_key_comment: 'amk-{{ date }}-@ansible-controller' # Ansible Master Key (AMK)
+
+
+# Use included dummy key for provisioning
+use_provisioning_key: true
+# File name for the default dummy key, used for initial provisioning
+provisioning_key_fn: dummy-default-key

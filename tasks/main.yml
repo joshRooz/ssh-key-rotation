@@ -1,24 +1,47 @@
 ---
 # tasks file for joshrooz.ssh-key-rotation
+- name: Create keychain directory
+  file:
+    path: '{{ keychain_path }}'
+    state: directory
+    mode: 0700
+  when: inventory_hostname == play_hosts[0]
+  delegate_to: localhost
+
+- name: Include default dummy key
+  copy:
+    dest: '{{ keychain_path }}'
+    src: '{{ provisioning_key_fn }}'
+    mode: 0700
+    owner: "{{ lookup('env', 'USER') }}"
+  when:
+    - use_provisioning_key
+    - inventory_hostname == play_hosts[0]
+  delegate_to: localhost
+
 - name: Generate a new ssh keypair on ansible controller host
   openssh_keypair:
-    path: "{{ lookup('env','PWD') }}/{{ ssh_key_path }}"
+    path: '{{ keychain_path }}/{{ master_key_fn }}'
     size: '{{ ssh_key_bits }}'
     owner: "{{ lookup('env', 'USER') }}"
     comment: '{{ ssh_key_comment }}'
-  when: inventory_hostname == play_hosts[0] # only run once across the active inventory
+  when: inventory_hostname == play_hosts[0]
   delegate_to: localhost
 
 - name: Register our public keys
   set_fact:
-    ssh_connection_key: "{{ lookup('file', lookup('env','PWD') + '/' + ssh_key_path + '.pub') }}"
-    ssh_dummy_key: "{{ lookup('file', lookup('env','PWD') + '/' + dummy_key_path + '.pub') }}"
+    ssh_connection_key: "{{ lookup('file', keychain_path + '/' + master_key_fn + '.pub') }}"
+
+- name: Register the provisioning key
+  set_fact:
+    provisioning_key: "{{ provisioning_key_fn }}.pub }}"
+  when: use_provisioning_key
 
 - name: Ensure that our public keys have been registered
   assert:
     that:
       - ssh_connection_key is defined
-      - ssh_dummy_key is defined
+      #- provisioning_key is defined
     quiet: yes
 
 - name: Add/update amk public key in remote authorized_keys file
