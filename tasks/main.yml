@@ -22,7 +22,7 @@
 - name: Generate a new ssh keypair on ansible controller host
   openssh_keypair:
     path: '{{ keychain_path }}/{{ master_key_fn }}'
-    size: '{{ ssh_key_bits }}'
+    type: ed25519
     owner: "{{ lookup('env', 'USER') }}"
     comment: '{{ ssh_key_comment }}'
   when: inventory_hostname == play_hosts[0]
