@@ -14,6 +14,7 @@
     type: ed25519
     owner: "{{ lookup('env', 'USER') }}"
     comment: '{{ ssh_key_comment }}'
+    force: yes
   when: inventory_hostname == play_hosts[0]
   delegate_to: localhost
 
